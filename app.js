@@ -26,22 +26,42 @@ var config = {
   		name: name,
   		dest: dest,
   		time: time,
-  		freq: freq
+  		freq: freq,
+  		dateAdded: firebase.database.ServerValue.TIMESTAMP
   	});
   });
 
 
   database.ref().on("child_added", function(childSnapshot) {
 
+  	
+
   	var snap = childSnapshot.val();
 
+  	var tfreq = snap.freq;
+
   	var newRow = $("<tr>");
+
+  	var firstTrain = moment(snap.time, "HH:mm").subtract(1, "years");
+
+  	var diff = moment().diff(moment(firstTrain), "minutes");
+
+  	var remain = diff % tfreq;
+
+  	var tilNextTrain = tfreq - remain; 
+
+  	var nextTrain = moment().add(tilNextTrain, "minutes").format("hh:mm");
+
+  	
 
   	newRow.append("<td>" + snap.name + "</td>");
   	newRow.append("<td>" + snap.dest + "</td>");
   	newRow.append("<td>" + snap.freq + "</td>");
-  	newRow.append("<td>" + 0 + "</td>");
-  	newRow.append("<td>" + 0 + "</td>");
+
+  	//current time diff first train time divided by frequency
+  	newRow.append("<td>" + nextTrain + "</td>");
+  	//next arrive diff current time
+  	newRow.append("<td>" + tilNextTrain + "</td>");
 
   	$("tbody").append(newRow);
 
